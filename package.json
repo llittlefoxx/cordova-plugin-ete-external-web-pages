@@ -1,0 +1,25 @@
+{
+  "name": "cordova-plugin-ete-external-web-pages",
+  "version": "2.0.0",
+  "description": "Opens and closes urls in external browser",
+  "cordova": {
+    "id": "cordova-plugin-WebViewOverlayPlugin",
+    "platforms": [
+      "ios"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/llittlefoxx/cordova-plugin-ete-external-web-pages.git"
+  },
+  "keywords": [
+    "ecosystem:cordova",
+    "cordova-ios"
+  ],
+  "author": "Mohamed ali Tlili",
+  "license": "Free",
+  "bugs": {
+    "url": "https://github.com/llittlefoxx/cordova-plugin-ete-external-web-pages/issues"
+  },
+  "homepage": "https://github.com/llittlefoxx/cordova-plugin-ete-external-web-pages#readme"
+}
