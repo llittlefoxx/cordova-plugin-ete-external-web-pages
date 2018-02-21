@@ -1,9 +1,9 @@
 {
   "name": "cordova-plugin-ete-external-web-pages",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Opens and closes urls in external browser",
   "cordova": {
-    "id": "cordova-plugin-WebViewOverlayPlugin",
+    "id": "cordova-plugin-ete-external-web-pages",
     "platforms": [
       "ios"
     ]

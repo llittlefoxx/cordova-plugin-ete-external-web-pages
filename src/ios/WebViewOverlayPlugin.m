@@ -99,6 +99,7 @@
     self.webView = [[UIWebView alloc] initWithFrame:self.view.frame];
     [self.webView setDelegate:self];
     self.webView.scrollView.bounces = NO;
+    self.webView.scalesPageToFit = YES;
     self.webView.autoresizingMask = self.view.autoresizingMask;
     [self.view addSubview:self.webView];
     
