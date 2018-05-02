@@ -40,4 +40,4 @@ WebViewOverlayPlugin.prototype.close = function() {
 };
 
 // Attaching the webViewOverlay object to the window object
-window.webViewOverlay = new
+window.webViewOverlay = new WebViewOverlayPlugin();

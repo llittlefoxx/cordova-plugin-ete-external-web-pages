@@ -34,7 +34,7 @@
 @property (nonatomic, strong) id commandDelegate;
 @property (nonatomic, strong) CDVInvokedUrlCommand* command;
 
-- (instancetype)initWithURL:(NSURL*)url Parameters:(NSArray*)parameters;
+- (instancetype)initWithURL:(NSURL*)url Parameters:(NSArray*)parameters Zoom:(BOOL)zoomable;
 
 @end
 
