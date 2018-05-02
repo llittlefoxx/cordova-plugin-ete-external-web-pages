@@ -1,4 +1,4 @@
-# cordova-plugin-WebViewOverlayPlugin
+# cordova-plugin-ete-external-web-pages
 This is a Cordova plugin which opens and closes a webview.
 
 ## Installation
