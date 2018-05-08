@@ -1,6 +1,6 @@
 {
   "name": "cordova-plugin-ete-external-web-pages",
-  "version": "2.0.4",
+  "version": "2.0.5",
   "description": "Opens and closes urls in external browser",
   "cordova": {
     "id": "cordova-plugin-ete-external-web-pages",

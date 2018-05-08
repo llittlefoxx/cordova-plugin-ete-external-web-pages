@@ -28,9 +28,15 @@
 
     BOOL zoomCommandResult = YES;
 
+    @try {
         if ([command.arguments[3] boolValue] == NO){
             zoomCommandResult = NO;
         }
+    }
+    @catch (NSException *exception) {
+        NSLog(@"%@", exception.reason);
+    }
+    
         NSLog(@"Zoomable  -> :: %d",zoomCommandResult);
 
 
@@ -78,12 +84,64 @@
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
+/*
+- (void)injectScript:(CDVInvokedUrlCommand*)command {
+    NSString* js = command.arguments[0];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self.webViewController.webView stringByEvaluatingJavaScriptFromString:@"myFunction = function(){ return {a : \"Test\"};}"];
+        NSString* result = [self.webViewController.webView stringByEvaluatingJavaScriptFromString:@"JSON.stringify(myFunction());"];
+        NSLog(@"JS RESULT: %@", result);
+    });
+}
+ */
+
+- (void)injectDeferredObject:(NSString*)source withWrapper:(NSString*)jsWrapper
+{
+    // Ensure an iframe bridge is created to communicate with the CDVInAppBrowserViewController
+    [self.webViewController.webView stringByEvaluatingJavaScriptFromString:@"(function(d){_cdvIframeBridge=d.getElementById('_cdvIframeBridge');if(!_cdvIframeBridge) {var e = _cdvIframeBridge = d.createElement('iframe');e.id='_cdvIframeBridge'; e.style.display='none';d.body.appendChild(e);}})(document)"];
+    /*
+    if (jsWrapper != nil) {
+        NSData* jsonData = [NSJSONSerialization dataWithJSONObject:@[source] options:0 error:nil];
+        NSString* sourceArrayString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+        if (sourceArrayString) {
+            NSString* sourceString = [sourceArrayString substringWithRange:NSMakeRange(1, [sourceArrayString length] - 2)];
+            NSString* jsToInject = [NSString stringWithFormat:jsWrapper, sourceString];
+            [self.webViewController.webView stringByEvaluatingJavaScriptFromString:jsToInject];
+        }
+    } else {
+        [self.webViewController.webView stringByEvaluatingJavaScriptFromString:source];
+    }*/
+}
+
+- (void)injectScript:(CDVInvokedUrlCommand*)command
+{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        NSString* jsCode = [NSString stringWithFormat:@"myFunction = function(){ %@ }", @"return document.getElementById('main').className;"];
+        
+        NSString* jsCodeCall = @"myFunction();";
+        
+        [self.webViewController.webView stringByEvaluatingJavaScriptFromString:jsCode];
+        NSString* result = [self.webViewController.webView stringByEvaluatingJavaScriptFromString:jsCodeCall];
+        
+        /*
+        NSData *objectData = [result dataUsingEncoding:NSUTF8StringEncoding];
+        NSDictionary *json = [NSJSONSerialization JSONObjectWithData:objectData options:NSJSONReadingMutableContainers error:nil];
+        for (NSString* key in json.allKeys) {
+            NSLog(@"RESULT %@ = %@", key, json[key]);
+        }
+         */
+        
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:@{@"className": result}];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    });
+    
+}
+
 
 @end
 
-@interface WebViewOverlayViewController()
+@interface WebViewOverlayViewController() <UIWebViewDelegate>
 
-@property (nonatomic, strong) UIWebView* webView;
 @property (nonatomic, strong) UIBarButtonItem* buttonBack;
 @property (nonatomic, strong) UIBarButtonItem* buttonNext;
 @property ( nonatomic, readwrite ) BOOL zoomable;
@@ -101,6 +159,9 @@
     _zoomable=zoomable;
     return self;
 }
+    
+    
+   
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -118,6 +179,8 @@
 
     [self configureWebView];
 }
+    
+    
 
 - (void)configureWebView {
 
@@ -195,6 +258,30 @@
 - (BOOL)webView:(UIWebView *)webView2
 shouldStartLoadWithRequest:(NSURLRequest *)request
  navigationType:(UIWebViewNavigationType)navigationType {
+    
+    NSURL* url = request.URL;
+    if ([[url scheme] isEqualToString:@"gap-iab"]) {
+        NSString* scriptCallbackId = [url host];
+        CDVPluginResult* pluginResult = nil;
+        
+        NSString* scriptResult = [url path];
+        NSError* __autoreleasing error = nil;
+        
+        // The message should be a JSON-encoded array of the result of the script which executed.
+        if ((scriptResult != nil) && ([scriptResult length] > 1)) {
+            scriptResult = [scriptResult substringFromIndex:1];
+            NSData* decodedResult = [NSJSONSerialization JSONObjectWithData:[scriptResult dataUsingEncoding:NSUTF8StringEncoding] options:kNilOptions error:&error];
+            if ((error == nil) && [decodedResult isKindOfClass:[NSArray class]]) {
+                pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:(NSArray*)decodedResult];
+            } else {
+                pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_JSON_EXCEPTION];
+            }
+        } else {
+            pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:@[]];
+        }
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:scriptCallbackId];
+        return NO;
+    }
 
     NSString *requestString = [[request URL] absoluteString];
 
