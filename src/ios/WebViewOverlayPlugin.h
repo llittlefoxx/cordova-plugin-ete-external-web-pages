@@ -32,6 +32,7 @@
 @interface WebViewOverlayViewController : UIViewController <UIWebViewDelegate>
 
 @property (nonatomic, strong) id commandDelegate;
+@property (nonatomic, strong) UIWebView* webView;
 @property (nonatomic, strong) CDVInvokedUrlCommand* command;
 
 - (instancetype)initWithURL:(NSURL*)url Parameters:(NSArray*)parameters Zoom:(BOOL)zoomable;
