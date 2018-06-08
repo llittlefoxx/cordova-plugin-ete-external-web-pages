@@ -115,23 +115,22 @@
 
 - (void)injectScript:(CDVInvokedUrlCommand*)command
 {
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        NSString* jsCode = [NSString stringWithFormat:@"myFunction = function(){ %@ }", @"return document.getElementById('main').className;"];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        NSString* jsCode = [NSString stringWithFormat:@"%@", command.arguments[0]];
         
-        NSString* jsCodeCall = @"myFunction();";
+       // NSString* jsCodeCall = @"myFunction();";
         
-        [self.webViewController.webView stringByEvaluatingJavaScriptFromString:jsCode];
-        NSString* result = [self.webViewController.webView stringByEvaluatingJavaScriptFromString:jsCodeCall];
+        //[self.webViewController.webView stringByEvaluatingJavaScriptFromString:jsCode];
+        NSString* result = [self.webViewController.webView stringByEvaluatingJavaScriptFromString:jsCode];
         
-        /*
+      
         NSData *objectData = [result dataUsingEncoding:NSUTF8StringEncoding];
         NSDictionary *json = [NSJSONSerialization JSONObjectWithData:objectData options:NSJSONReadingMutableContainers error:nil];
         for (NSString* key in json.allKeys) {
             NSLog(@"RESULT %@ = %@", key, json[key]);
         }
-         */
         
-        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:@{@"className": result}];
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:@{@"result": result}];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     });
     
@@ -157,6 +156,7 @@
     _url = url;
     _parameters = parameters;
     _zoomable=zoomable;
+    [UIView setAnimationsEnabled:NO];
     return self;
 }
     

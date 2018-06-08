@@ -1,5 +1,5 @@
 # cordova-plugin-ete-external-web-pages
-This is a Cordova plugin which opens and closes a webview.
+This is a Cordova plugin which opens, closes and injects js in a webview.
 
 ## Installation
 
@@ -55,4 +55,16 @@ This parameter is optional. By default, the external webview will be zoomable. i
 Example :
  ```javascript
     webViewOverlay.close();
+```
+
+
+### Injecting js in the external browser
+Example :
+ ```javascript
+        webViewOverlay.injectScript({
+            code: "function() {return 'hello world'}"
+        },
+            function (res) {
+                console.log(JSON.stringify(res));
+            });
 ```
